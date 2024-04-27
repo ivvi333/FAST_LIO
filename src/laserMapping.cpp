@@ -59,7 +59,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <livox_ros2_driver/livox_interfaces/msg/custom_msg.hpp>
+#include <livox_interfaces/msg/custom_msg.hpp>
 #include "preprocess.h"
 #include <ikd-Tree/ikd_Tree.h>
 
