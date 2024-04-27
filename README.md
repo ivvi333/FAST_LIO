@@ -1,5 +1,3 @@
-> ROS2 Fork repo maintainer: [Ericsiii](https://github.com/Ericsii)
-
 ## Related Works and Extended Application
 
 **SLAM:**
@@ -74,14 +72,12 @@ PCL    >= 1.8,   Follow [PCL Installation](https://pointclouds.org/downloads/#li
 
 Eigen  >= 3.3.4, Follow [Eigen Installation](http://eigen.tuxfamily.org/index.php?title=Main_Page).
 
-### <span id="1.3">1.3. **livox_ros_driver2**</span>
-Follow [livox_ros_driver2 Installation](https://github.com/Livox-SDK/livox_ros_driver2).
-
-You can also use the one I modified [livox_ros_driver2](https://github.com/Ericsii/livox_ros_driver2/tree/feature/use-standard-unit)
+### <span id="1.3">1.3. **livox_ros2_driver**</span>
+Follow [livox_ros2_driver Installation](https://github.com/ivvi333/livox_ros2_driver).
 
 *Remarks:*
-- Since the FAST-LIO must support Livox serials LiDAR firstly, so the **livox_ros_driver** must be installed and **sourced** before run any FAST-LIO launch file.
-- How to source? The easiest way is add the line ``` source $Licox_ros_driver_dir$/devel/setup.bash ``` to the end of file ``` ~/.bashrc ```, where ``` $Licox_ros_driver_dir$ ``` is the directory of the livox ros driver workspace (should be the ``` ws_livox ``` directory if you completely followed the livox official document).
+- Since the FAST-LIO must support Livox serials LiDAR firstly, so the **livox_ros2_driver** must be installed and **sourced** before run any FAST-LIO launch file.
+- How to source? The easiest way is add the line ``` source $livox_ros2_driver_dir$/install/setup.sh ``` to the end of file ``` ~/.bashrc ```, where ``` $livox_ros2_driver_dir$ ``` is the directory of the livox ros2 driver workspace (should be the ``` ws_livox ``` directory if you completely followed the livox official document).
 
 
 ## 2. Build
@@ -89,13 +85,13 @@ Clone the repository and colcon build:
 
 ```bash
     cd <ros2_ws>/src # cd into a ros2 workspace folder
-    git clone https://github.com/Ericsii/FAST_LIO.git --recursive
+    git clone https://github.com/ivvi333/FAST_LIO.git --recursive
     cd ..
     rosdep install --from-paths src --ignore-src -y
     colcon build --symlink-install
     . ./install/setup.bash # use setup.zsh if use zsh
 ```
-- **Remember to source the livox_ros_driver before build (follow [1.3 livox_ros_driver](#1.3))**
+- **Remember to source the livox_ros2_driver before build**
 - If you want to use a custom build of PCL, add the following line to ~/.bashrc
 ```export PCL_ROOT={CUSTOM_PCL_PATH}```
 ## 3. Directly run
@@ -108,7 +104,7 @@ B. The warning message "Failed to find match for field 'time'." means the timest
 C. We recommend to set the **extrinsic_est_en** to false if the extrinsic is give. As for the extrinsic initiallization, please refer to our recent work: [**Robust Real-time LiDAR-inertial Initialization**](https://github.com/hku-mars/LiDAR_IMU_Init).
 
 ### 3.1 Run use ros launch
-Connect to your PC to Livox LiDAR by following  [Livox-ros-driver2 installation](https://github.com/Livox-SDK/livox_ros_driver2), then
+Connect to your PC to Livox LiDAR by following  [Livox-ros2-driver installation](https://github.com/ivvi333/livox_ros2_driver), then
 ```bash
 cd <ros2_ws>
 . install/setup.bash # use setup.zsh if use zsh
@@ -117,31 +113,16 @@ ros2 launch fast_lio mapping.launch.py config_file:=avia.yaml
 
 Change `config_file` parameter to other yaml file under config directory as you need.
 
-Launch livox ros driver. Use MID360 as an example.
+Launch livox ros driver. 
 
 ```bash
-ros2 launch livox_ros_driver2 msg_MID360_launch.py
+ros2 launch livox_ros2_driver livox_lidar_msg_launch.py
 ```
 
-- For livox serials, FAST-LIO only support the data collected by the ``` livox_lidar_msg.launch ``` since only its ``` livox_ros_driver2/CustomMsg ``` data structure produces the timestamp of each LiDAR point which is very important for the motion undistortion. ``` livox_lidar.launch ``` can not produce it right now.
-- If you want to change the frame rate, please modify the **publish_freq** parameter in the [livox_lidar_msg.launch](https://github.com/Livox-SDK/livox_ros_driver/blob/master/livox_ros_driver2/launch/livox_lidar_msg.launch) of [Livox-ros-driver](https://github.com/Livox-SDK/livox_ros_driver2) before make the livox_ros_driver pakage.
+- For livox serials, FAST-LIO only support the data collected by the ``` livox_lidar_msg_launch.py ``` since only its ``` livox_ros2_driver/CustomMsg ``` data structure produces the timestamp of each LiDAR point which is very important for the motion undistortion. ``` livox_lidar_launch.py ``` can not produce it right now.
+- If you want to change the frame rate, please modify the **publish_freq** parameter in the livox_lidar_msg_launch.py of Livox-ros2-driver before make the livox_ros2_driver pakage.
 
-### 3.2 For Livox serials with external IMU
-
-mapping_avia.launch theratically supports mid-70, mid-40 or other livox serial LiDAR, but need to setup some parameters befor run:
-
-Edit ``` config/avia.yaml ``` to set the below parameters:
-
-1. LiDAR point cloud topic name: ``` lid_topic ```
-2. IMU topic name: ``` imu_topic ```
-3. Translational extrinsic: ``` extrinsic_T ```
-4. Rotational extrinsic: ``` extrinsic_R ``` (only support rotation matrix)
-- The extrinsic parameters in FAST-LIO is defined as the LiDAR's pose (position and rotation matrix) in IMU body frame (i.e. the IMU is the base frame). They can be found in the official manual.
-- FAST-LIO produces a very simple software time sync for livox LiDAR, set parameter ```time_sync_en``` to ture to turn on. But turn on **ONLY IF external time synchronization is really not possible**, since the software time sync cannot make sure accuracy.
-
-### 3.4 PCD file save
-
-Set ``` pcd_save_enable ``` in launchfile to ``` 1 ```. All the scans (in global frame) will be accumulated and saved to the file ``` FAST_LIO/PCD/scans.pcd ``` after the FAST-LIO is terminated. ```pcl_viewer scans.pcd``` can visualize the point clouds.
+**```pcl_viewer scans.pcd``` can visualize the point clouds**.
 
 *Tips for pcl_viewer:*
 - change what to visualize/color by pressing keyboard 1,2,3,4,5 when pcl_viewer is running. 
