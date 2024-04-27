@@ -84,12 +84,12 @@ Follow [livox_ros2_driver Installation](https://github.com/ivvi333/livox_ros2_dr
 Clone the repository and colcon build:
 
 ```bash
-    cd <ros2_ws>/src # cd into a ros2 workspace folder
-    git clone https://github.com/ivvi333/FAST_LIO.git --recursive
-    cd ..
-    rosdep install --from-paths src --ignore-src -y
-    colcon build --symlink-install
-    . ./install/setup.bash # use setup.zsh if use zsh
+cd <ros2_ws>/src # cd into a ros2 workspace folder
+git clone https://github.com/ivvi333/FAST_LIO.git --recursive
+cd ..
+rosdep install --from-paths src --ignore-src -y
+colcon build --symlink-install
+. ./install/setup.bash # use setup.zsh if use zsh
 ```
 - **Remember to source the livox_ros2_driver before build**
 - If you want to use a custom build of PCL, add the following line to ~/.bashrc
