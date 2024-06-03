@@ -87,7 +87,7 @@ Clone the repository and colcon build:
 cd <ros2_ws>/src # cd into a ros2 workspace folder
 git clone https://github.com/ivvi333/FAST_LIO.git --recursive
 cd ..
-rosdep install --from-paths src --ignore-src -y
+rosdep install --from-paths src --ignore-src -y --os=ubuntu:jammy
 colcon build --symlink-install
 . ./install/setup.bash # use setup.zsh if use zsh
 ```
